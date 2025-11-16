@@ -23,41 +23,9 @@ struct FilteredApplicationList: View {
             Text("Select an application")
                 .navigationTitle("Application")
         }
-        .navigationTitle("Job Applications")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                EditButton()
-            }
-            
-            ToolbarItem {
-                Button(action: addApplication) {
-                    Label("Add Application", systemImage: "plus")
-                }
-            }
-        }
-        .sheet(item: $newApplication) { application in
-            NavigationStack {
-                ApplicationDetailView(application: application, isNew: true)
-            }
-            .interactiveDismissDisabled()
-        }
-    }
-    private func addApplication() {
-        withAnimation {
-            let newItem = Application(
-                position: "",
-                positionType: "",
-                remunerationType: "",
-                employmentType: "",
-                iR35: "",
-                positionCommitment: "",
-                workstyle: "",
-                officeDays: "")
-            modelContext.insert(newItem)
-            newApplication = newItem
-        }
     }
 }
+
 //
 //#Preview {
 //    FilteredApplicationList()

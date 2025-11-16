@@ -40,21 +40,34 @@ struct ApplicationList: View {
         _applications = Query(filter: predicate, sort: [SortDescriptor(\Application.status?.name, order: .forward), SortDescriptor(\Application.dateApplied, order: .reverse)])
     }
 
+    // UPDATE ApplicationList.swift
+    // Replace the body with this version that includes empty state:
+
     var body: some View {
         VStack {
-            List {
-                ForEach(applications) { application in
-                    if application.appStatus != "Closed" {
-                        NavigationLink {
-                            ApplicationDetailView(application: application, isNew: false)
-                                .navigationTitle("Application")
-                        } label: {
-                            ApplicationListRowView(application: application)
+            if applications.isEmpty {
+                // Empty State
+                ContentUnavailableView(
+                    "No Applications Yet",
+                    systemImage: "doc.text.magnifyingglass",
+                    description: Text("Track your job search by adding your first application")
+                )
+            } else {
+                // Existing List
+                List {
+                    ForEach(applications) { application in
+                        if application.appStatus != "Closed" {
+                            NavigationLink {
+                                ApplicationDetailView(application: application, isNew: false)
+                                    .navigationTitle("Application")
+                            } label: {
+                                ApplicationListRowView(application: application)
+                            }
                         }
                     }
+                    .onDelete(perform: deleteApplications)
+                    .listRowSeparator(.visible)
                 }
-                .onDelete(perform: deleteApplications)
-                .listRowSeparator(.visible)
             }
         }
         .navigationTitle("Applications")

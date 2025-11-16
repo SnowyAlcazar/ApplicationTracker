@@ -30,6 +30,10 @@ final class Application {
     var interviewResult: String = ""
     var notes: String = ""
     var appStatus: String = "Open"
+    var umbrellaCompanyName: String = ""
+    var umbrellaContactName: String = ""
+    var umbrellaContactPhone: String = ""
+    var umbrellaContactEmail: String = ""
     var agency: Agency?
     var agent: Agent?
     var client: Client?
@@ -64,7 +68,11 @@ final class Application {
         interviewDate: Date = Date(),
         interviewResult: String = "",
         notes: String = "",
-        appStatus: String = "Open"
+        appStatus: String = "Open",
+        umbrellaCompanyName: String = "",
+        umbrellaContactName: String = "",
+        umbrellaContactPhone: String = "",
+        umbrellaContactEmail: String = ""
     )
     {
         self.position = position
@@ -87,6 +95,11 @@ final class Application {
         self.interviewResult = interviewResult
         self.notes = notes
         self.appStatus = appStatus
+        self.umbrellaCompanyName = umbrellaCompanyName
+        self.umbrellaContactName = umbrellaContactName
+        self.umbrellaContactPhone = umbrellaContactPhone
+        self.umbrellaContactEmail = umbrellaContactEmail
+
     }
     func update<T>(keyPath: ReferenceWritableKeyPath<Application, T>, to value: T) {
       self[keyPath: keyPath] = value

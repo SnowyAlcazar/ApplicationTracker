@@ -9,91 +9,152 @@ import SwiftUI
 import SwiftData
 import Charts
 
-class StatusData: Identifiable {
-    let type: String
-    let val: Int
-    
-    var id: String { type }
-
-    init(type: String = "", val: Int = 0) {
-        self.type = type
-        self.val = val
-    }
-}
-
 struct ApplicationsByStatus: View {
-    @Environment(\.modelContext) var modelContext
-    @Query(sort: \Application.appStatus, order: .forward) var applications: [Application]
-    @Query(sort: \Status.name, order: .reverse) var statuses: [Status]
+    @Query(sort: \Application.dateApplied, order: .reverse) var applications: [Application]
     
     @State private var dataPoints: [StatusData] = []
-    @State private var uniqueStatusList: [String] = []
+    
+    // Calculate total active applications
+    private var activeCount: Int {
+        applications.filter { $0.appStatus != "Closed" }.count
+    }
     
     var body: some View {
-        VStack {
-            Chart {
-                ForEach(dataPoints, id: \.id) { dataPoint in
-                    ///Pie chart
-                    SectorMark(
-                        angle: .value("Status", dataPoint.val),
-                        innerRadius: .ratio(0.6),
-                        angularInset: 1.5
-                    )
-                    .foregroundStyle(by: .value("Type", dataPoint.type))
-                    .cornerRadius(5.0)
-                    .annotation(position: .overlay) {
-                        Text("\(dataPoint.val)")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                    }
-                }
-            }
-            .frame(height: 500)
-            .chartBackground { proxy in
-                Text("Active applications")
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Active Applications")
                     .font(.headline)
-                
+                Text("\(activeCount) active • \(applications.count) total")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-//            .chartForegroundStyleScale(
-//                [
-//                    "Open": .yellow,
-//                    "On hold": .blue,
-//                    "Interview": .pink,
-//                    "Closed": .gray,
-//                    "Offer": .purple,
-//                    "Accepted": .green
-//                ]
-//            )
-        }
-        .onAppear(perform: loadData)
-        .onDisappear(perform: clearOutData)
-        .padding()
-    }
-
-    func loadData() {
-        populateDataPoints(type: "", val: 0)
-    }
-    func clearOutData() {
-        dataPoints = []
-    }
-       
-    func populateDataPoints(type: String, val: Int) {
-        for status in statuses {
-            var statusCount = 0
-            if status.name != "Closed" {
-                for app in applications {
-                    if app.appStatus == status.name {
-                        statusCount += 1
+            .padding(.horizontal)
+            
+            // Chart
+            if dataPoints.isEmpty {
+                ContentUnavailableView(
+                    "No Active Applications",
+                    systemImage: "chart.pie",
+                    description: Text("Add some applications to see the breakdown")
+                )
+                .frame(height: 300)
+            } else {
+                Chart(dataPoints) { dataPoint in
+                    SectorMark(
+                        angle: .value("Count", dataPoint.val),
+                        innerRadius: .ratio(0.618),  // Golden ratio for aesthetics
+                        angularInset: 2
+                    )
+                    .foregroundStyle(dataPoint.color)
+                    .cornerRadius(4)
+                    .annotation(position: .overlay) {
+                        if dataPoint.val > 0 {
+                            Text("\(dataPoint.val)")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.white)
+                                .shadow(color: .black.opacity(0.3), radius: 2)
+                        }
                     }
                 }
-                if statusCount > 0 {
-                    dataPoints.append(StatusData (type: status.name, val: statusCount))
+                .frame(height: 300)
+                .chartBackground { _ in
+                    VStack(spacing: 4) {
+                        Text("\(activeCount)")
+                            .font(.system(size: 48, weight: .bold))
+                        Text("Active")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
                 }
+                
+                // Legend with counts
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(dataPoints) { dataPoint in
+                        HStack {
+                            Circle()
+                                .fill(dataPoint.color)
+                                .frame(width: 12, height: 12)
+                            
+                            Text(dataPoint.type)
+                                .font(.subheadline)
+                            
+                            Spacer()
+                            
+                            Text("\(dataPoint.val)")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                            
+                            Text("(\(percentage(for: dataPoint))%)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.systemGray6).opacity(0.5))
+                .cornerRadius(8)
+                .padding(.horizontal)
             }
         }
+        .padding()
+        .padding(.vertical)
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .onAppear(perform: loadData)
+        .onChange(of: applications.count) { _, _ in
+            loadData()
+        }
+    }
+    
+    private func loadData() {
+        // Count applications by status (excluding closed)
+        var statusCounts: [String: Int] = [:]
+        
+        for app in applications where app.appStatus != "Closed" {
+            let status = app.appStatus
+            statusCounts[status, default: 0] += 1
+        }
+        
+        // Convert to StatusData array and sort by count
+        dataPoints = statusCounts.map { StatusData(type: $0.key, val: $0.value) }
+            .sorted { $0.val > $1.val }
+    }
+    
+    private func percentage(for dataPoint: StatusData) -> Int {
+        guard activeCount > 0 else { return 0 }
+        return Int(round(Double(dataPoint.val) / Double(activeCount) * 100))
     }
 }
 
-//#Preview {
-//    ApplicationsByStatus()
-//}
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Application.self, configurations: config)
+    
+    // Create sample data with various statuses
+    let app1 = Application(position: "Job 1", appStatus: "Open")
+    let app2 = Application(position: "Job 2", appStatus: "Open")
+    let app3 = Application(position: "Job 3", appStatus: "Interview")
+    let app4 = Application(position: "Job 4", appStatus: "Interview")
+    let app5 = Application(position: "Job 5", appStatus: "Interview")
+    let app6 = Application(position: "Job 6", appStatus: "Interview")
+    let app7 = Application(position: "Job 7", appStatus: "Offer")
+    let app8 = Application(position: "Job 8", appStatus: "On hold")
+    let app9 = Application(position: "Job 9", appStatus: "Closed")
+    
+    container.mainContext.insert(app1)
+    container.mainContext.insert(app2)
+    container.mainContext.insert(app3)
+    container.mainContext.insert(app4)
+    container.mainContext.insert(app5)
+    container.mainContext.insert(app6)
+    container.mainContext.insert(app7)
+    container.mainContext.insert(app8)
+    container.mainContext.insert(app9)
+    
+    return ApplicationsByStatus()
+        .modelContainer(container)
+        .padding()
+        .background(Color.black)
+}

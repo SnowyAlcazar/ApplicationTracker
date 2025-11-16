@@ -18,12 +18,12 @@ struct ChartsView: View {
         
         var displayName: String {
             switch self {
-                case .appByStatus:
-                    "By Status"
-                case .stackBar:
-                    "Status Barchart Stacked"
-                case .bar:
-                    "Status Barchart"
+            case .appByStatus:
+                "Active Applications (Pie Chart)"
+            case .stackBar:
+                "Status Breakdown (Stacked Bar)"
+            case .bar:
+                "Applications by Status (Bar Chart)"
             }
         }
     }
@@ -38,7 +38,8 @@ struct ChartsView: View {
                         Text($0.displayName)
                     }
                 }
-                .pickerStyle(.segmented)
+                .pickerStyle(.menu)
+                .padding(.horizontal)
                 
                 switch selectedChart {
                 case .appByStatus:

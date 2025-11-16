@@ -10,6 +10,7 @@ import SwiftData
 
 @main
 struct ApplicationTrackerApp: App {
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

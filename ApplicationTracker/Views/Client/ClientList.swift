@@ -9,11 +9,11 @@ import SwiftUI
 import SwiftData
 
 struct ClientList: View {
-    @Environment(\.modelContext) private var modelContext
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedClient: String = ""
+    @Environment(\.modelContext) var modelContext
+    @State private var searchText = ""
+    @State private var newClient: Client?
     
-    @Query(sort: \Client.name) private var clients: [Client]
+    @Query(sort: [SortDescriptor(\Client.name)]) var clients: [Client]
     
     init(clientFilter: String = "") {
         let predicate = #Predicate<Client> { client in
@@ -23,42 +23,36 @@ struct ClientList: View {
         _clients = Query(filter: predicate, sort: \Client.name)
     }
     
-    @State private var newClient: Client?
-    
     var body: some View {
         NavigationSplitView {
-            Group {
-                if !clients.isEmpty {
+            VStack {
+                if clients.isEmpty {
+                    // Empty State
+                    ContentUnavailableView(
+                        "No Clients Yet",
+                        systemImage: "building.2",
+                        description: Text("Add companies you're applying to or interviewing with")
+                    )
+                } else {
+                    // Client List
                     List {
                         ForEach(clients) { client in
                             NavigationLink {
-                                ClientDetailView(client: client)
-                                    .navigationTitle("Agency")
+                                ClientDetailView(client: client, isNew: false)
                             } label: {
-                                VStack(alignment: .leading) {
-                                    HStack {
-                                        Label("", systemImage: "building.2.fill")
-                                            .labelsHidden()
-                                            .padding(.trailing, 5)
-                                        Text(client.name)
-                                            .font(.subheadline)
-                                    }
-                                }
+                                ClientListRow(client: client)
                             }
+                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                            .listRowBackground(Color.clear)
                         }
                         .onDelete(perform: deleteClients)
-                        .listRowSeparator(.visible)
-                        .padding([.top, .bottom])
                     }
-                    .font(.caption)
-
-                } else {
-                    ContentUnavailableView {
-                        Label("No clients", systemImage: "person.and.person")
-                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
             .navigationTitle("Clients")
+            .searchable(text: $searchText)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
@@ -81,13 +75,6 @@ struct ClientList: View {
         }
     }
     
-    private func addClient() {
-        withAnimation {
-            let newItem = Client(name: "")
-            modelContext.insert(newItem)
-            newClient = newItem
-        }
-    }
     private func deleteClients(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
@@ -95,13 +82,22 @@ struct ClientList: View {
             }
         }
     }
+    
+    private func addClient() {
+        withAnimation {
+            let newItem = Client(name: "", businessSegment: "", hiringManager: "", hiringManagerPosition: "")
+            modelContext.insert(newItem)
+            newClient = newItem
+        }
+    }
 }
 
 #Preview {
-    let preview = Preview(Client.self)
-    preview.addExamples(Client.sampleClients)
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: Client.self, configurations: config)
+    
     return NavigationStack {
         ClientList()
-            .modelContainer(preview.container)
+            .modelContainer(container)
     }
 }

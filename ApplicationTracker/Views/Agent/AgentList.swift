@@ -13,6 +13,7 @@ struct AgentList: View {
     @Environment(\.dismiss) private var dismiss
 //    @State private var selectedAgent: String = ""
     @Query(sort: [SortDescriptor(\Agent.name)]) private var agents: [Agent]
+    @State private var isEditing = false
     
     init(agentFilter: String = "") {
         let predicate = #Predicate<Agent> { agent in
@@ -43,9 +44,11 @@ struct AgentList: View {
                     }
 
                 } else {
-                    ContentUnavailableView {
-                        Label("No agents", systemImage: "person.and.person")
-                    }
+                    ContentUnavailableView(
+                        "No Agents Yet",
+                        systemImage: "person.circle",
+                        description: Text("Add recruitment agents to keep track of your contacts")
+                    )
                 }
             }
             .navigationTitle("Agents")
@@ -57,6 +60,7 @@ struct AgentList: View {
                     Button(action: addAgent) {
                         Label("Add Agent", systemImage: "plus")
                     }
+                    Button("Edit", action: { isEditing = true })
                 }
             }
             .sheet(item: $newAgent) { agent in
@@ -64,6 +68,9 @@ struct AgentList: View {
                     AgentDetailView(agent: agent, isNew: true)
                 }
                 .interactiveDismissDisabled()
+            }
+            .sheet(isPresented: $isEditing) {
+                EditAgentView()
             }
         } detail: {
             Text("Select an agent")

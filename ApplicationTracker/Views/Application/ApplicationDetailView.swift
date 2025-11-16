@@ -2,7 +2,7 @@
 //  ApplicationDetailView.swift
 //  ApplicationTracker
 //
-//  Created by Mark Brown on 29/03/2024.
+//  Created by Mark Brown on 14/11/2025.
 //
 
 import SwiftUI
@@ -23,288 +23,488 @@ struct ApplicationDetailView: View {
         self.isNew = isNew
     }
 
-    @State private var locationType = ""
     @State private var dateApplied: Date = Date.now
     @State private var update: String = ""
     @State private var updatedAt: Date = Date.now
-    @State private var agentName: String = ""
-    @State private var agentPhone: String = ""
-    @State private var agentEmail: String = ""
-    @State private var clientHiringManager: String = ""
-    @State private var interviewDate: Date = Date()
-    @State private var interviewResult: String = ""
-    @State private var positionTypes: String = ""
-    @State private var businessSector: String = ""
+    @State private var newAgent: Agent?
+    @State private var newClient: Client?
+    
+    // State for conditional display
+    @State private var isInsideIR35: Bool = false
     
     @Query(sort: [SortDescriptor(\Agency.name)]) var agencies: [Agency]
     @Query(sort: [SortDescriptor(\Agent.name)]) var agents: [Agent]
     @Query(sort: [SortDescriptor(\Client.name)]) var clients: [Client]
     @Query(sort: [SortDescriptor(\Status.name)]) var statuses: [Status]
 
-    /// Setting focus state for fields
-
     enum FocusedField {
          case position
     }
 
-    @State private var position = ""
     @FocusState private var focusedField: FocusedField?
     @State private var newStatus: Status?
-    @State private var isEditingStatusList = false
-
+    
+    // Employment Type Options
+    enum EmploymentType: String, CaseIterable {
+        case permanent = "Permanent / Fixed Term"
+        case contract = "Contract"
+        
+        var displayName: String { rawValue }
+    }
+    
+    // IR35 Options
+    enum IR35Status: String, CaseIterable {
+        case outside = "Outside IR35"
+        case inside = "Inside IR35"
+        
+        var displayName: String { rawValue }
+    }
+    
+    // Payment Frequency
+    enum PaymentFrequency: String, CaseIterable {
+        case weekly = "Weekly"
+        case monthly = "Monthly"
+        
+        var displayName: String { rawValue }
+    }
+    
+    var isPermanent: Bool {
+        application.employmentType == EmploymentType.permanent.rawValue
+    }
+    
+    var isContract: Bool {
+        application.employmentType == EmploymentType.contract.rawValue
+    }
     
     var body: some View {
-        Form {
-            Section("About the job you applied for") {
-                VStack(alignment: .leading) {
-                    Text("POSITION TITLE")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    if isNew {
-                        TextField("Add a job title", text: $application.position, axis: .vertical)
-                            .focused($focusedField, equals: .position)
-                            .padding(.bottom)
-                    } else {
-                        TextField("Add a job title", text: $application.position)
-                            .padding(.bottom)
-                    }
-                    
-                    Text("BUSINESS SECTOR")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("Which business sector: Finance, Travel etc", text: $application.businessSector)
-                        .padding(.bottom)
-
-                    Text("ROLE TYPE")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("Sales agent, Project Manager, Accountant, PA etc", text: $application.positionType)
-                        .padding(.bottom)
-
-                    Text("EMPLOYMENT BASIS")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("Permanent, contract, temporary etc", text: $application.employmentType)
-                        .padding(.bottom)
-
-                    HStack {
-                        Text("SELECT THE DATE YOU APPLIED FOR THIS JOB")
-                            .font(.caption)
-                            .foregroundStyle(.gray)
-                        Spacer()
-                        DatePicker("Date applied", selection: $application.dateApplied, displayedComponents: .date)
-                            .labelsHidden()
-                    }
-                }
-            }
-            Section("Pay and conditions") {
-                VStack(alignment: .leading) {
-                    Text("PAY UNITS")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("Hourly, Daily, Annual etc", text: $application.remunerationType)
-                        .padding(.bottom)
-                    Text("PAY PER UNIT")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("Enter the pay rate", value: $application.remunerationAmount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
-                        .padding(.bottom)
-                    Text("IR35 OR OTHER TAX REGS")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("Inside / Outside... any other tax based considerations", text: $application.iR35)
-                        .padding(.bottom)
-                    Text("HOW MANY DAYS A WEEK IN OFFICE")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    TextField("Approximately how many days in the office?", text: $application.officeDays)
-                        .padding(.bottom)
-                    Text("TIME COMMITMENT")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    TextField("Full-time, Part-time, Job share etc", text: $application.positionCommitment)
-                        .padding(.bottom)
-                    Text("WORKSTYLE")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    TextField("Remote, Hybrid, Office etc", text: $application.workstyle)
-                        .padding(.bottom)
-                }
-            }
-            Section("Origin, skills and experience") {
-                VStack(alignment: .leading) {
-                    Text("WHERE DID YOU SEE THIS JOB ADVERTISED?")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    TextField("JobServe, Hays, etc", text: $application.whereAdvertised, axis: .vertical)
-                        .labelsHidden()
-                        .padding(.bottom)
-
-                    Text("SKILLS AND EXPERIENCE")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                        .padding(.top)
-                    TextField("Add the core required skills and experience", text: $application.requiredSkills, axis: .vertical)
-                        .labelsHidden()
-                        .padding(.bottom)
-                }
-            }
-            Section("Contacts") {
-                VStack(alignment: .leading) {
-                    if !agencies.isEmpty {
+        ScrollView {
+            VStack(spacing: 16) {
+                // MARK: - Job Details Section
+                SectionCard(title: "Job Details", icon: "briefcase") {
+                    VStack(spacing: 16) {
+                        DetailInputRow(
+                            label: "Position",
+                            icon: "briefcase.fill",
+                            text: $application.position,
+                            placeholder: "e.g., Accounts clerk",
+                            focused: $focusedField,
+                            field: .position,
+                            isNew: isNew
+                        )
+                        
+                        DetailInputRow(
+                            label: "Business Sector",
+                            icon: "building.2",
+                            text: $application.businessSector,
+                            placeholder: "e.g., Finance, Technology"
+                        )
+                        
+                        DetailInputRow(
+                            label: "Role Type",
+                            icon: "person.text.rectangle",
+                            text: $application.positionType,
+                            placeholder: "e.g., Accounts clerk, Sales"
+                        )
+                        
+                        // Employment Type Picker
                         HStack {
-                            Text("SELECT AN AGENCY")
-                                .font(.caption)
-                                .foregroundStyle(.gray)
+                            Label("Employment Type", systemImage: "calendar")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
                             Spacer()
-                            Picker("Pick an agency if known", selection: $application.agency) {
-                                Text("None")
-                                    .tag(nil as Agency?)
-                                ForEach(agencies) { agency in
-                                    Text(agency.name)
-                                        .tag(agency as Agency?)
-                                        .font(.caption)
+                            
+                            Picker("Employment Type", selection: $application.employmentType) {
+                                Text("Select...")
+                                    .tag("")
+                                ForEach(EmploymentType.allCases, id: \.self) { type in
+                                    Text(type.displayName)
+                                        .tag(type.rawValue)
                                 }
                             }
                             .labelsHidden()
                         }
-                    }
-                    if !agents.isEmpty {
+                        
+                        // Date Applied
                         HStack {
-                            Text("SELECT AN AGENT")
-                                .font(.caption)
-                                .foregroundStyle(.gray)
+                            Label("Date Applied", systemImage: "calendar")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
                             Spacer()
-                            Picker("Pick an agent if known", selection: $application.agent) {
-                                Text("None")
-                                    .tag(nil as Agent?)
-                                ForEach(agents) { agent in
-                                    Text(agent.name)
-                                        .tag(agent as Agent?)
-                                }
-                            }
-                            .labelsHidden()
+                            
+                            DatePicker("", selection: $application.dateApplied, displayedComponents: .date)
+                                .labelsHidden()
                         }
                     }
-                    if !clients.isEmpty {
-                        HStack {
-                            Text("SELECT A CLIENT")
-                                .font(.caption)
-                                .foregroundStyle(.gray)
-                            Spacer()
-                            Picker("Pick a client if known", selection: $application.client) {
-                                Text("None")
-                                    .tag(nil as Client?)
-                                ForEach(clients) { client in
-                                    Text(client.name)
-                                        .tag(client as Client?)
-                                }
-                            }
-                            .labelsHidden()
-                        }
-                    }
-                }
-            }
-            Section("Interviews") {
-                HStack {
-                    Text("ADD AN INTERVIEW")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
-                    Spacer()
-                    Button("Add New") {
-                        addInterview()
-                    }
-                    .background(.tint)
-                    .foregroundColor(.white)
-                    .fontWeight(.semibold)
-                    .buttonStyle(.borderedProminent)
-                    .cornerRadius(5)
-                    .disabled(application.status?.name == "Closed")
                 }
                 
-                List {
-                    if !application.sortedInterviews.isEmpty {
-                        ForEach(application.sortedInterviews) { assocInterview in
-                            NavigationLink {
-                                InterviewDetailView(interview: assocInterview, isNew: false)
-                                    .navigationTitle("Interview Detail")
-                            } label: {
-                                //InterviewListRow(interview: assocInterview)
+                // MARK: - Pay & Conditions Section (Conditional)
+                if !application.employmentType.isEmpty {
+                    SectionCard(title: "Pay & Conditions", icon: "banknote") {
+                        VStack(spacing: 16) {
+                            if isPermanent {
+                                // PERMANENT FIELDS
                                 HStack {
-                                    Text(assocInterview.name)
+                                    Label("Annual Salary", systemImage: "dollarsign.circle")
+                                        .font(.subheadline)
+                                        .foregroundColor(.blue.opacity(0.8))
+                                    
                                     Spacer()
-                                    Text(assocInterview.interviewDate, style: .date)
-                                    Text("")
-                                    Text(assocInterview.startTime, style: .time)
-                                    Text(":")
-                                    Text(assocInterview.endTime, style: .time)
+                                    
+                                    TextField("Amount", value: $application.remunerationAmount, format: .currency(code: Locale.current.currency?.identifier ?? "GBP"))
+                                        .multilineTextAlignment(.trailing)
+                                        .keyboardType(.decimalPad)
+                                        .frame(maxWidth: 150)
+                                }
+                                
+                                DetailInputRow(
+                                    label: "Bonus",
+                                    icon: "gift.fill",
+                                    text: $application.remunerationType,
+                                    placeholder: "e.g., 20%"
+                                )
+                                
+                            } else if isContract {
+                                // CONTRACT FIELDS
+                                
+                                // IR35 Status Picker
+                                HStack {
+                                    Label("IR35 Status", systemImage: "doc.text")
+                                        .font(.subheadline)
+                                        .foregroundColor(.blue.opacity(0.8))
+                                    
+                                    Spacer()
+                                    
+                                    Picker("IR35", selection: $application.iR35) {
+                                        Text("Select...")
+                                            .tag("")
+                                        ForEach(IR35Status.allCases, id: \.self) { status in
+                                            Text(status.displayName)
+                                                .tag(status.rawValue)
+                                        }
+                                    }
+                                    .labelsHidden()
+                                    .onChange(of: application.iR35) { oldValue, newValue in
+                                        isInsideIR35 = (newValue == IR35Status.inside.rawValue)
+                                    }
+                                }
+                                
+                                // Only show these if Inside IR35
+                                if application.iR35 == IR35Status.inside.rawValue {
+                                    DetailInputRow(
+                                        label: "Umbrella Company Name",
+                                        icon: "building.2",
+                                        text: $application.umbrellaCompanyName,
+                                        placeholder: "Umbrella company name"
+                                    )
+                                    
+                                    DetailInputRow(
+                                        label: "Contact Name",
+                                        icon: "person",
+                                        text: $application.umbrellaContactName,
+                                        placeholder: "Contact person at umbrella"
+                                    )
+                                    
+                                    DetailInputRow(
+                                        label: "Contact Phone",
+                                        icon: "phone",
+                                        text: $application.umbrellaContactPhone,
+                                        placeholder: "Phone number"
+                                    )
+                                    
+                                    DetailInputRow(
+                                        label: "Contact Email",
+                                        icon: "envelope",
+                                        text: $application.umbrellaContactEmail,
+                                        placeholder: "Email address"
+                                    )
+                                    
+                                    DetailInputRow(
+                                        label: "Take Home Pay",
+                                        icon: "banknote",
+                                        text: $application.positionCommitment,
+                                        placeholder: "Net daily/weekly amount"
+                                    )
+                                }
+                                
+                                // Day Rate
+                                HStack {
+                                    Label("Day Rate", systemImage: "dollarsign.circle")
+                                        .font(.subheadline)
+                                        .foregroundColor(.blue.opacity(0.8))
+                                    
+                                    Spacer()
+                                    
+                                    TextField("Amount", value: $application.remunerationAmount, format: .currency(code: Locale.current.currency?.identifier ?? "GBP"))
+                                        .multilineTextAlignment(.trailing)
+                                        .keyboardType(.decimalPad)
+                                        .frame(maxWidth: 150)
+                                }
+                                
+                                // Payment Frequency
+                                HStack {
+                                    Label("Payment Frequency", systemImage: "calendar.badge.clock")
+                                        .font(.subheadline)
+                                        .foregroundColor(.blue.opacity(0.8))
+                                    
+                                    Spacer()
+                                    
+                                    Picker("Payment Frequency", selection: $application.remunerationType) {
+                                        Text("Select...")
+                                            .tag("")
+                                        ForEach(PaymentFrequency.allCases, id: \.self) { freq in
+                                            Text(freq.displayName)
+                                                .tag(freq.rawValue)
+                                        }
+                                    }
+                                    .labelsHidden()
+                                }
+                            }
+                            
+                            // COMMON FIELDS (both permanent and contract)
+                            DetailInputRow(
+                                label: "Office Days per Week",
+                                icon: "building",
+                                text: $application.officeDays,
+                                placeholder: "e.g., 3 days per week"
+                            )
+                            
+                            DetailInputRow(
+                                label: "Workstyle",
+                                icon: "laptopcomputer",
+                                text: $application.workstyle,
+                                placeholder: "Remote, Hybrid, Office"
+                            )
+                        }
+                    }
+                }
+                
+                // MARK: - Origin & Skills Section
+                SectionCard(title: "Origin & Skills", icon: "star") {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Where Advertised", systemImage: "megaphone")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
+                            TextField("e.g., LinkedIn, JobServe, Direct", text: $application.whereAdvertised, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Skills & Experience", systemImage: "sparkles")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
+                            TextField("Required skills and experience...", text: $application.requiredSkills, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(minHeight: 60)
+                        }
+                    }
+                }
+                
+                // MARK: - Contacts Section
+                SectionCard(title: "Contacts", icon: "person.2") {
+                    VStack(spacing: 16) {
+                        if !agents.isEmpty || isNew {
+                            HStack {
+                                Label("Agent", systemImage: "person")
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue.opacity(0.8))
+                                
+                                Spacer()
+                                
+                                Menu {
+                                    // None option
+                                    Button("None") {
+                                        application.agent = nil
+                                    }
+                                    
+                                    if !agents.isEmpty {
+                                        Divider()
+                                        
+                                        // Existing agents
+                                        ForEach(agents) { agent in
+                                            Button(agent.name) {
+                                                application.agent = agent
+                                            }
+                                        }
+                                    }
+                                    
+                                    Divider()
+                                    
+                                    // Add new agent option
+                                    Button(action: { addNewAgent() }) {
+                                        Label("Add New Agent...", systemImage: "plus.circle")
+                                    }
+                                } label: {
+                                    HStack {
+                                        Text(application.agent?.name ?? "Select...")
+                                            .foregroundColor(application.agent == nil ? .secondary : .primary)
+                                        Image(systemName: "chevron.up.chevron.down")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if !clients.isEmpty || isNew {
+                            HStack {
+                                Label("Client", systemImage: "briefcase")
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue.opacity(0.8))
+                                
+                                Spacer()
+                                
+                                Menu {
+                                    // None option
+                                    Button("None") {
+                                        application.client = nil
+                                    }
+                                    
+                                    if !clients.isEmpty {
+                                        Divider()
+                                        
+                                        // Existing clients
+                                        ForEach(clients) { client in
+                                            Button(client.name) {
+                                                application.client = client
+                                            }
+                                        }
+                                    }
+                                    
+                                    Divider()
+                                    
+                                    // Add new client option
+                                    Button(action: { addNewClient() }) {
+                                        Label("Add New Client...", systemImage: "plus.circle")
+                                    }
+                                } label: {
+                                    HStack {
+                                        Text(application.client?.name ?? "Select...")
+                                            .foregroundColor(application.client == nil ? .secondary : .primary)
+                                        Image(systemName: "chevron.up.chevron.down")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            Section("Updates and notes") {
-                    Text("WHAT'S NEW?")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-                    TextField("Type your update here...", text: $application.update, axis: .vertical)
-                    Text("NOTES")
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-                    TextField("Add notes here...", text: $application.notes, axis: .vertical)
-            }
-            Section("Application Status") {
-                VStack {
-                    HStack {
-                        Text("APPLICATION STATUS")
-                            .font(.caption)
-                            .foregroundStyle(.gray)
-                        Spacer()
-                        Picker("Select a status", selection: $application.status) {
-                            Text("None")
-                                .tag(nil as Status?)
-                            ForEach(statuses) { status in
-                                Text(status.name)
-                                    .tag(status as Status?)
+                
+                // MARK: - Interviews Section
+                SectionCard(title: "Interviews", icon: "person.2.wave.2") {
+                    VStack(spacing: 12) {
+                        // Add button with gradient
+                        Button(action: addInterview) {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                Text("Add Interview")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                        }
+                        .disabled(application.status?.name == "Closed")
+                        
+                        // Interview list
+                        if !application.sortedInterviews.isEmpty {
+                            ForEach(application.sortedInterviews) { interview in
+                                NavigationLink {
+                                    InterviewDetailView(interview: interview, isNew: false)
+                                } label: {
+                                    InterviewRow(interview: interview)
+                                }
+                            }
+                        } else {
+                            Text("No interviews scheduled")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color(.systemGray6).opacity(0.5))
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                
+                // MARK: - Updates & Notes Section
+                SectionCard(title: "Updates & Notes", icon: "note.text") {
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Latest Update", systemImage: "bell")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
+                            TextField("What's new?", text: $application.update, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(minHeight: 60)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Notes", systemImage: "note")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
+                            TextField("Additional notes...", text: $application.notes, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(minHeight: 80)
+                        }
+                    }
+                }
+                
+                // MARK: - Status Section
+                SectionCard(title: "Application Status", icon: "flag") {
+                    VStack(spacing: 16) {
+                        HStack {
+                            Label("Status", systemImage: "flag.fill")
+                                .font(.subheadline)
+                                .foregroundColor(.blue.opacity(0.8))
+                            
+                            Spacer()
+                            
+                            Picker("Status", selection: $application.status) {
+                                Text("None")
+                                    .tag(nil as Status?)
+                                ForEach(statuses) { status in
+                                    Text(status.name)
+                                        .tag(status as Status?)
+                                }
+                            }
+                            .labelsHidden()
+                            
+                            Button(action: addStatus) {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.blue)
                             }
                         }
-                        .labelsHidden()
-                        Spacer()
                         
-                        Button("Add New") {
-                            addSatus()
+                        // Show current status badge
+                        if !application.appStatus.isEmpty {
+                            HStack {
+                                StatusBadge(status: application.appStatus, size: .large)
+                                Spacer()
+                            }
                         }
-                        .foregroundColor(.white)
-                        .fontWeight(.semibold)
-                        .background(.tint.opacity(0.75))
-                        .buttonStyle(.borderedProminent)
-                        .cornerRadius(5)
                     }
                 }
             }
+            .padding()
         }
-        .onAppear {
-            focusedField = .position
-        }
-        .onChange(of: application.status?.name) { oldValue, newValue in
-            switch application.status?.name {
-            case "Closed": return application.appStatus = "Closed"
-            case "Interview": return application.appStatus = "Interview"
-            case "On hold": return application.appStatus = "On hold"
-            case "None": return application.appStatus = "None"
-            case "Offer": return application.appStatus = "Offer"
-            case "Accepted": return application.appStatus = "Accepted"
-            default: return application.appStatus = "Open"
-            }
-        }
-        .onChange(of: application) { oldValue, newValue in
-            application.update(keyPath: \.updatedAt, to: Date.now)
-        }
+        .background(Color(.systemBackground))
         .navigationTitle(isNew ? "New Application" : "Application")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if isNew {
                 ToolbarItem(placement: .confirmationAction) {
@@ -320,6 +520,26 @@ struct ApplicationDetailView: View {
                 }
             }
         }
+        .onAppear {
+            if isNew {
+                focusedField = .position
+            }
+            // Set IR35 state on appear
+            isInsideIR35 = (application.iR35 == IR35Status.inside.rawValue)
+        }
+        .onChange(of: application.status?.name) { oldValue, newValue in
+            switch application.status?.name {
+            case "Closed": application.appStatus = "Closed"
+            case "Interview": application.appStatus = "Interview"
+            case "On hold": application.appStatus = "On hold"
+            case "Offer": application.appStatus = "Offer"
+            case "Accepted": application.appStatus = "Accepted"
+            default: application.appStatus = "Open"
+            }
+        }
+        .onChange(of: application) { oldValue, newValue in
+            application.update(keyPath: \.updatedAt, to: Date.now)
+        }
         .sheet(item: $newInterview) { interview in
             NavigationStack {
                 InterviewDetailView(interview: interview, isNew: true)
@@ -329,6 +549,18 @@ struct ApplicationDetailView: View {
         .sheet(item: $newStatus) { status in
             NavigationStack {
                 StatusDetail(status: status, isNew: true)
+            }
+            .interactiveDismissDisabled()
+        }
+        .sheet(item: $newAgent) { agent in
+            NavigationStack {
+                AgentDetailView(agent: agent, isNew: true)
+            }
+            .interactiveDismissDisabled()
+        }
+        .sheet(item: $newClient) { client in
+            NavigationStack {
+                ClientDetailView(client: client, isNew: true)
             }
             .interactiveDismissDisabled()
         }
@@ -342,20 +574,134 @@ struct ApplicationDetailView: View {
         }
     }
     
-    private func addSatus() {
+    private func addStatus() {
         withAnimation {
             let newItem = Status(name: "")
             modelContext.insert(newItem)
             newStatus = newItem
         }
     }
+    
+    private func addNewAgent() {
+        withAnimation {
+            let agent = Agent(name: "")
+            modelContext.insert(agent)
+            newAgent = agent
+        }
+    }
+
+    private func addNewClient() {
+        withAnimation {
+            let client = Client(name: "")
+            modelContext.insert(client)
+            newClient = client
+        }
+    }
+}
+
+// MARK: - Helper Components
+
+struct DetailInputRow: View {
+    let label: String
+    let icon: String
+    @Binding var text: String
+    let placeholder: String
+    var focused: FocusState<ApplicationDetailView.FocusedField?>.Binding? = nil
+    var field: ApplicationDetailView.FocusedField? = nil
+    var isNew: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(label, systemImage: icon)
+                .font(.subheadline)
+                .foregroundColor(.blue.opacity(0.8))
+            
+            if let focused = focused, let field = field, isNew {
+                TextField(placeholder, text: $text)
+                    .textFieldStyle(.roundedBorder)
+                    .focused(focused, equals: field)
+            } else {
+                TextField(placeholder, text: $text)
+                    .textFieldStyle(.roundedBorder)
+            }
+        }
+    }
+}
+
+struct InterviewRow: View {
+    let interview: Interview
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(interview.name.isEmpty ? "Interview" : interview.name)
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                
+                HStack(spacing: 12) {
+                    Label(interview.interviewDate.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
+                        .foregroundColor(.blue.opacity(0.7))
+                    Label(interview.startTime.formatted(date: .omitted, time: .shortened), systemImage: "clock")
+                        .foregroundColor(.blue.opacity(0.7))
+                }
+                .font(.caption)
+            }
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.5))
+        .cornerRadius(8)
+    }
 }
 
 #Preview {
-    let preview = Preview(Application.self)
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(
+        for: Application.self, Agent.self, Agency.self, Client.self, Status.self, Interview.self,
+        configurations: config
+    )
+    
+    let agent = Agent(name: "Adele Bywater", mobilePhone: "020 7092 3204")
+    let client = Client(name: "ECMS Consultancy")
+    let agency = Agency(name: "ECMS Agency")
+    let status = Status(name: "Interview")
+    
+    let application = Application(
+        position: "Contract PM - ECMS",
+        businessSector: "Insurance",
+        positionType: "Project Manager",
+        remunerationType: "Weekly",
+        remunerationAmount: 650,
+        employmentType: "Contract",
+        iR35: "Outside IR35",
+        positionCommitment: "",
+        workstyle: "Hybrid",
+        officeDays: "3",
+        whereAdvertised: "Direct from Adele",
+        dateApplied: Calendar.current.date(byAdding: .day, value: -15, to: Date())!,
+        requiredSkills: "Insurance, Azure, Cloud migration",
+        notes: "Great opportunity",
+        appStatus: "Interview"
+    )
+    application.agent = agent
+    application.client = client
+    application.agency = agency
+    application.status = status
+    
+    container.mainContext.insert(agent)
+    container.mainContext.insert(client)
+    container.mainContext.insert(agency)
+    container.mainContext.insert(status)
+    container.mainContext.insert(application)
+    
     return NavigationStack {
-        ApplicationDetailView(application: Application.sampleApps[2])
-            .modelContainer(preview.container)
+        ApplicationDetailView(application: application)
+            .modelContainer(container)
     }
 }
 

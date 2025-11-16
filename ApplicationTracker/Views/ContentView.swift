@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.modelContext) var modelContext
+    
     var body: some View {
         TabView {
             ChartsView()
@@ -27,11 +30,6 @@ struct ContentView: View {
                 .tabItem {
                     Label("Clients", systemImage: "building.2.fill")
                 }
-
-//            StatusList(status: Status(), isNew: false)
-//                .tabItem {
-//                    Label("Status", systemImage: "chart.line.uptrend.xyaxis")
-//                }
         }
     }
 }
