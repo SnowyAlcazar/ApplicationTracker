@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		411889AA2ECA221200164FDA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 411889A92ECA221100164FDA /* LaunchScreen.storyboard */; };
 		411AD7752BFB855800C35C85 /* InterviewListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AD7742BFB855800C35C85 /* InterviewListRow.swift */; };
 		411AD77F2BFCE81300C35C85 /* AgentRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AD77E2BFCE81300C35C85 /* AgentRow.swift */; };
 		411AD7812BFCF41F00C35C85 /* ApplicationsByStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AD7802BFCF41F00C35C85 /* ApplicationsByStatus.swift */; };
@@ -107,6 +108,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		411889A92ECA221100164FDA /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		411AD7742BFB855800C35C85 /* InterviewListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewListRow.swift; sourceTree = "<group>"; };
 		411AD77E2BFCE81300C35C85 /* AgentRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRow.swift; sourceTree = "<group>"; };
 		411AD7802BFCF41F00C35C85 /* ApplicationsByStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsByStatus.swift; sourceTree = "<group>"; };
@@ -416,6 +418,7 @@
 				41CEDD762BB6EB4A00F40A7B /* Views */,
 				41CEDD652BB6D89B00F40A7B /* Preview Content */,
 				41AD40212EC87FAB0056C9DC /* AppIcon.appiconset */,
+				411889A92ECA221100164FDA /* LaunchScreen.storyboard */,
 			);
 			path = ApplicationTracker;
 			sourceTree = "<group>";
@@ -557,6 +560,7 @@
 				41AD40242EC87FAB0056C9DC /* mac128.png in Resources */,
 				41AD40252EC87FAB0056C9DC /* notification40.png in Resources */,
 				41AD40262EC87FAB0056C9DC /* settings58.png in Resources */,
+				411889AA2ECA221200164FDA /* LaunchScreen.storyboard in Resources */,
 				41AD40272EC87FAB0056C9DC /* watch216.png in Resources */,
 				41AD40282EC87FAB0056C9DC /* watch87.png in Resources */,
 				41AD40292EC87FAB0056C9DC /* mac256.png in Resources */,

@@ -558,11 +558,34 @@ struct ApplicationDetailView: View {
             }
             .interactiveDismissDisabled()
         }
+        .onChange(of: newAgent) { oldValue, newValue in
+            if oldValue != nil && newValue == nil {
+                // Sheet was dismissed, check if agent was saved (has a name)
+                if let savedAgent = oldValue, !savedAgent.name.isEmpty {
+                    application.agent = savedAgent
+                } else if let savedAgent = oldValue, savedAgent.name.isEmpty {
+                    // User cancelled or left empty, delete it
+                    modelContext.delete(savedAgent)
+                }
+            }
+        }
+
         .sheet(item: $newClient) { client in
             NavigationStack {
                 ClientDetailView(client: client, isNew: true)
             }
             .interactiveDismissDisabled()
+        }
+        .onChange(of: newClient) { oldValue, newValue in
+            if oldValue != nil && newValue == nil {
+                // Sheet was dismissed, check if client was saved (has a name)
+                if let savedClient = oldValue, !savedClient.name.isEmpty {
+                    application.client = savedClient
+                } else if let savedClient = oldValue, savedClient.name.isEmpty {
+                    // User cancelled or left empty, delete it
+                    modelContext.delete(savedClient)
+                }
+            }
         }
     }
     
