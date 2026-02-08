@@ -96,10 +96,10 @@ struct AgencyDetailView: View {
     }
 }
 
-#Preview {
-let preview = Preview(Agency.self)
-    return NavigationStack {
-        AgencyDetailView(agency: Agency.sampleAgencies[1])
-            .modelContainer(preview.container)
-    }
-}
+//#Preview {
+//let preview = Preview(Agency.self)
+//    return NavigationStack {
+//        AgencyDetailView(agency: Agency.sampleAgencies[1])
+//            .modelContainer(preview.container)
+//    }
+//}

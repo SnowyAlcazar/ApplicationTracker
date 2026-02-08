@@ -109,10 +109,10 @@ struct InterviewDetailView: View {
     }
 }
 
-#Preview {
-let preview = Preview(Interview.self)
-    return NavigationStack {
-        InterviewDetailView(interview: Interview.sampleInterviews[1])
-            .modelContainer(preview.container)
-    }
-}
+//#Preview {
+//let preview = Preview(Interview.self)
+//    return NavigationStack {
+//        InterviewDetailView(interview: Interview.sampleInterviews[1])
+//            .modelContainer(preview.container)
+//    }
+//}

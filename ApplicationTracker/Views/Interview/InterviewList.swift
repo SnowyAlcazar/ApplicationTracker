@@ -64,11 +64,11 @@ struct InterviewList: View {
     }
 }
 
-#Preview {
-    let preview = Preview(Interview.self)
-    preview.addExamples(Interview.sampleInterviews)
-    return NavigationStack {
-        InterviewList()
-            .modelContainer(preview.container)
-    }
-}
+//#Preview {
+//    let preview = Preview(Interview.self)
+//    preview.addExamples(Interview.sampleInterviews)
+//    return NavigationStack {
+//        InterviewList()
+//            .modelContainer(preview.container)
+//    }
+//}

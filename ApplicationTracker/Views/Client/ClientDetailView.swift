@@ -84,10 +84,10 @@ struct ClientDetailView: View {
     }
 }
 
-#Preview {
-let preview = Preview(Client.self)
-    return NavigationStack {
-        ClientDetailView(client: Client.sampleClients[1])
-            .modelContainer(preview.container)
-    }
-}
+//#Preview {
+//let preview = Preview(Client.self)
+//    return NavigationStack {
+//        ClientDetailView(client: Client.sampleClients[1])
+//            .modelContainer(preview.container)
+//    }
+//}

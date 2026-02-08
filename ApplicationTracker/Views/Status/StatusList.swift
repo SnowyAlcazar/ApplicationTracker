@@ -83,13 +83,13 @@ struct StatusList: View {
     }
 }
 
-#Preview {
-    let isNew = false
-    let preview = Preview(Status.self)
-    preview.addExamples(Status.sampleStatuses)
-    return NavigationStack {
-        StatusList(status: Status(name: "Open"), isNew: false)
-            .modelContainer(preview.container)
-    }
-}
+//#Preview {
+//    let isNew = false
+//    let preview = Preview(Status.self)
+//    preview.addExamples(Status.sampleStatuses)
+//    return NavigationStack {
+//        StatusList(status: Status(name: "Open"), isNew: false)
+//            .modelContainer(preview.container)
+//    }
+//}
 

@@ -58,11 +58,11 @@ struct StatusDetail: View {
     }
 }
 
-#Preview {
-let preview = Preview(Status.self)
-    return NavigationStack {
-        StatusDetail(status: Status.sampleStatuses[0])
-            .modelContainer(preview.container)
-    }
-}
+//#Preview {
+//let preview = Preview(Status.self)
+//    return NavigationStack {
+//        StatusDetail(status: Status.sampleStatuses[0])
+//            .modelContainer(preview.container)
+//    }
+//}
 
