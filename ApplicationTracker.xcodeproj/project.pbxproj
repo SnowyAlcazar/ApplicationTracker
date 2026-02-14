@@ -27,6 +27,9 @@
 		416F8CD22BF24DD900BC4BE8 /* QueryViewApplicationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416F8CD12BF24DD900BC4BE8 /* QueryViewApplicationList.swift */; };
 		416F8CD42BF2545100BC4BE8 /* FilteredApplicationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416F8CD32BF2545100BC4BE8 /* FilteredApplicationList.swift */; };
 		4175B15C2D5E0C5100DB32AB /* Detail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175B15B2D5E0C5100DB32AB /* Detail.swift */; };
+		419DFC872F3FCED0006F7434 /* iPadLayoutFixes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DFC862F3FCED0006F7434 /* iPadLayoutFixes.swift */; };
+		419DFC892F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md in Resources */ = {isa = PBXBuildFile; fileRef = 419DFC882F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md */; };
+		419DFC8B2F3FE6FD006F7434 /* StatusInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DFC8A2F3FE6FD006F7434 /* StatusInitializer.swift */; };
 		41AD3FE52EC551220056C9DC /* MVP_Plan.md in Resources */ = {isa = PBXBuildFile; fileRef = 41AD3FE42EC551210056C9DC /* MVP_Plan.md */; };
 		41AD3FE72EC552030056C9DC /* PRIORITY_FIXES.md in Resources */ = {isa = PBXBuildFile; fileRef = 41AD3FE62EC552030056C9DC /* PRIORITY_FIXES.md */; };
 		41AD3FE92EC695930056C9DC /* ApplicationListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3FE82EC695930056C9DC /* ApplicationListRowView.swift */; };
@@ -88,6 +91,9 @@
 		416F8CD12BF24DD900BC4BE8 /* QueryViewApplicationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryViewApplicationList.swift; sourceTree = "<group>"; };
 		416F8CD32BF2545100BC4BE8 /* FilteredApplicationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilteredApplicationList.swift; sourceTree = "<group>"; };
 		4175B15B2D5E0C5100DB32AB /* Detail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail.swift; sourceTree = "<group>"; };
+		419DFC862F3FCED0006F7434 /* iPadLayoutFixes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadLayoutFixes.swift; sourceTree = "<group>"; };
+		419DFC882F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CRASH_FIX_ANALYSIS.md; sourceTree = "<group>"; };
+		419DFC8A2F3FE6FD006F7434 /* StatusInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusInitializer.swift; sourceTree = "<group>"; };
 		41AD3FE42EC551210056C9DC /* MVP_Plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MVP_Plan.md; sourceTree = "<group>"; };
 		41AD3FE62EC552030056C9DC /* PRIORITY_FIXES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIORITY_FIXES.md; sourceTree = "<group>"; };
 		41AD3FE82EC695930056C9DC /* ApplicationListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationListRowView.swift; sourceTree = "<group>"; };
@@ -265,6 +271,9 @@
 				41F0F94C2F38B1DF00D897D1 /* Assets.xcassets */,
 				41CEDD5E2BB6D89800F40A7B /* ApplicationTracker */,
 				41CEDD5D2BB6D89800F40A7B /* Products */,
+				419DFC862F3FCED0006F7434 /* iPadLayoutFixes.swift */,
+				419DFC882F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md */,
+				419DFC8A2F3FE6FD006F7434 /* StatusInitializer.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -428,6 +437,7 @@
 				41CEDD672BB6D89B00F40A7B /* Preview Assets.xcassets in Resources */,
 				41AD3FE72EC552030056C9DC /* PRIORITY_FIXES.md in Resources */,
 				411889AA2ECA221200164FDA /* LaunchScreen.storyboard in Resources */,
+				419DFC892F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md in Resources */,
 				41F0F94D2F38B1DF00D897D1 /* Assets.xcassets in Resources */,
 				41AD3FE52EC551220056C9DC /* MVP_Plan.md in Resources */,
 				41CEDD642BB6D89B00F40A7B /* Assets.xcassets in Resources */,
@@ -451,7 +461,9 @@
 				41AD404C2EC89F530056C9DC /* Color+Extensions.swift in Sources */,
 				41335B112C089A8200FDD0EC /* AgencyByStatus.swift in Sources */,
 				41B9E8462BD1545800474E45 /* Interview.swift in Sources */,
+				419DFC8B2F3FE6FD006F7434 /* StatusInitializer.swift in Sources */,
 				411AD7752BFB855800C35C85 /* InterviewListRow.swift in Sources */,
+				419DFC872F3FCED0006F7434 /* iPadLayoutFixes.swift in Sources */,
 				41CEDD6F2BB6D8FB00F40A7B /* Application.swift in Sources */,
 				41AD3FF72EC7F3530056C9DC /* ApplicationDetailView.swift in Sources */,
 				411D048A2BF65EF200E1B78B /* StatusList.swift in Sources */,

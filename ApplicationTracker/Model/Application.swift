@@ -42,10 +42,10 @@ final class Application {
     @Relationship(deleteRule: .cascade, inverse: \Interview.application)
     var interviews: [Interview]? = []
     
+    // Safer sorted interviews that won't cause layout loops
     var sortedInterviews: [Interview] {
-        var si = Array(interviews!)
-        si.sort(by: { $0.interviewDate < $1.interviewDate })
-        return si
+        guard let interviews = interviews else { return [] }
+        return interviews.sorted { $0.interviewDate < $1.interviewDate }
     }
     
     init(

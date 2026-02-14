@@ -28,7 +28,11 @@ struct SectionedQueryView<Content: View, Model: PersistentModel, Key: Hashable>:
         let result = keys.reduce([QueryViewDataSection]()) { partialResult, key in
             partialResult + [.init(key: key, models: data[key] ?? [])]
         }
-        content(result)
+        
+        // Defensive: Limit sections to prevent iPad layout explosion
+        let limitedResult = Array(result.prefix(100))
+        
+        content(limitedResult)
     }
                                   
     private var keys: [Key] {

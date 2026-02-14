@@ -21,11 +21,14 @@ struct ApplicationList: View {
     @State private var showClosedApplications = false
     var status = Status()
     
+    @State private var hasInitializedStatuses = false
+    
     ///For amending the Query and filtering/sorting the applicationFilter results
     ///_applications = Query(filter: predicate, sort: [SortDescriptor(\Application.status?.name, order: .reverse), SortDescriptor(\Application.dateApplied, order: .reverse)])
 
     
     init(applicationFilter: String = "") {
+        print("🟢 ApplicationList init called")
         let predicate = #Predicate<Application> { application in
             applicationFilter.isEmpty
             || application.position.localizedStandardContains(applicationFilter)
@@ -87,6 +90,11 @@ struct ApplicationList: View {
             }
             .interactiveDismissDisabled()
         }
+        .onAppear {
+            print("🔵 ApplicationList appeared")
+            print("🔵 Current statuses count: \(statuses.count)")
+            initializeDefaultStatuses()
+        }
     }
     
     private func deleteApplications(offsets: IndexSet) {
@@ -111,6 +119,55 @@ struct ApplicationList: View {
                 appStatus: "Open")
             modelContext.insert(newItem)
             newApplication = newItem
+        }
+    }
+    
+    private func initializeDefaultStatuses() {
+        // Only initialize once
+        guard !hasInitializedStatuses else { 
+            print("🔵 Already initialized statuses flag")
+            return 
+        }
+        hasInitializedStatuses = true
+        
+        print("🔵 Initializing statuses...")
+        
+        // Define required statuses
+        let defaultStatuses = [
+            "Open",
+            "Interview",
+            "On hold",
+            "Offer",
+            "Accepted",
+            "Closed"
+        ]
+        
+        // Get names of existing statuses
+        let existingNames = Set(statuses.map { $0.name })
+        print("   Found \(statuses.count) existing: \(existingNames)")
+        
+        // Create any missing statuses
+        var created = 0
+        for statusName in defaultStatuses {
+            if !existingNames.contains(statusName) {
+                let status = Status(name: statusName)
+                modelContext.insert(status)
+                print("   ✅ Creating status: '\(statusName)'")
+                created += 1
+            } else {
+                print("   ℹ️ Already exists: '\(statusName)'")
+            }
+        }
+        
+        if created > 0 {
+            do {
+                try modelContext.save()
+                print("📋 Created \(created) new status(es)!")
+            } catch {
+                print("❌ Error saving: \(error)")
+            }
+        } else {
+            print("📋 All 6 statuses already exist")
         }
     }
 }

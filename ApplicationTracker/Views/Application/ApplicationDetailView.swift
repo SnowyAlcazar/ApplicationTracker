@@ -17,6 +17,12 @@ struct ApplicationDetailView: View {
 
     @State private var newInterview: Interview?
     @State private var sortOrder = KeyPathComparator(\Interview.interviewDate)
+    
+    // Prevent update loops on iPad
+    @State private var isUpdatingStatus = false
+    
+    // Detect iPad for layout adjustments
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     init(application: Application, isNew: Bool = false) {
         self.application = application
@@ -408,7 +414,7 @@ struct ApplicationDetailView: View {
                             .padding()
                             .background(
                                 LinearGradient(
-                                    colors: [Color(hex: "667eea"), Color(hex: "764ba2")],
+                                    colors: [.blue, .purple],
                                     startPoint: .leading,
                                     endPoint: .trailing
                                 )
@@ -418,9 +424,10 @@ struct ApplicationDetailView: View {
                         }
                         .disabled(application.status?.name == "Closed")
                         
-                        // Interview list
-                        if !application.sortedInterviews.isEmpty {
-                            ForEach(application.sortedInterviews) { interview in
+                        // Interview list - Use let binding to cache the sorted result
+                        let sortedInterviews = application.sortedInterviews
+                        if !sortedInterviews.isEmpty {
+                            ForEach(sortedInterviews) { interview in
                                 NavigationLink {
                                     InterviewDetailView(interview: interview, isNew: false)
                                 } label: {
@@ -526,19 +533,82 @@ struct ApplicationDetailView: View {
             }
             // Set IR35 state on appear
             isInsideIR35 = (application.iR35 == IR35Status.inside.rawValue)
-        }
-        .onChange(of: application.status?.name) { oldValue, newValue in
-            switch application.status?.name {
-            case "Closed": application.appStatus = "Closed"
-            case "Interview": application.appStatus = "Interview"
-            case "On hold": application.appStatus = "On hold"
-            case "Offer": application.appStatus = "Offer"
-            case "Accepted": application.appStatus = "Accepted"
-            default: application.appStatus = "Open"
+            
+            // Sync appStatus with status on appear
+            if let statusName = application.status?.name {
+                let expectedAppStatus: String
+                switch statusName {
+                case "Closed": 
+                    expectedAppStatus = "Closed"
+                case "Interview", "Interviewing": 
+                    expectedAppStatus = "Interview"
+                case "On hold": 
+                    expectedAppStatus = "On hold"
+                case "Offer", "Offered": 
+                    expectedAppStatus = "Offer"
+                case "Accepted", "Acceptance": 
+                    expectedAppStatus = "Accepted"
+                case "Open":
+                    expectedAppStatus = "Open"
+                default: 
+                    expectedAppStatus = statusName // Use the status name as-is
+                }
+                
+                if application.appStatus != expectedAppStatus {
+                    print("📍 onAppear: Syncing appStatus '\(application.appStatus)' → '\(expectedAppStatus)'")
+                    application.appStatus = expectedAppStatus
+                }
+            } else if application.appStatus.isEmpty {
+                // No status selected, default to Open
+                print("📍 onAppear: No status selected, defaulting to 'Open'")
+                application.appStatus = "Open"
             }
         }
-        .onChange(of: application) { oldValue, newValue in
-            application.update(keyPath: \.updatedAt, to: Date.now)
+        .onChange(of: application.status?.name) { oldValue, newValue in
+            // Prevent recursive updates
+            guard !isUpdatingStatus else { 
+                print("⚠️ Blocked recursive status update")
+                return 
+            }
+            guard oldValue != newValue else { 
+                print("⚠️ Status name unchanged: \(newValue ?? "nil")")
+                return 
+            }
+            
+            print("✅ Status changing from '\(oldValue ?? "nil")' to '\(newValue ?? "nil")'")
+            
+            isUpdatingStatus = true
+            defer { isUpdatingStatus = false }
+            
+            let newAppStatus: String
+            switch application.status?.name {
+            case "Closed": 
+                newAppStatus = "Closed"
+            case "Interview", "Interviewing": 
+                newAppStatus = "Interview"
+            case "On hold": 
+                newAppStatus = "On hold"
+            case "Offer", "Offered": 
+                newAppStatus = "Offer"
+            case "Accepted", "Acceptance": 
+                newAppStatus = "Accepted"
+            case "Open":
+                newAppStatus = "Open"
+            case nil:
+                newAppStatus = "Open" // Default when no status selected
+            default: 
+                newAppStatus = application.status?.name ?? "Open" // Use the status name as-is
+            }
+            
+            print("   Setting appStatus to: '\(newAppStatus)' (was: '\(application.appStatus)')")
+            
+            // Only update if the status is actually different
+            if application.appStatus != newAppStatus {
+                application.appStatus = newAppStatus
+                print("   ✅ appStatus updated successfully")
+            } else {
+                print("   ℹ️ appStatus already correct")
+            }
         }
         .sheet(item: $newInterview) { interview in
             NavigationStack {
