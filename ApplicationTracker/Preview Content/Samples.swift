@@ -19,10 +19,82 @@ extension Application {
 
     static var sampleApps: [Application] {
         [
-            Application(position: "Sample 1", businessSector: "Insurance", positionType: "Contract", remunerationType: "Daily", remunerationAmount: 600.0, employmentType: "Contract", iR35: "Outside", positionCommitment: "Full time", workstyle: "Remote", officeDays: "Occasionally", whereAdvertised: "Direct contact", dateApplied: lastWeek!, requiredSkills: "Some", requiredExperience: "Some", update: "", updatedAt: twoDaysAgo!, interviewDate: nextWeek!, interviewResult: "", notes: "", appStatus: "Open"),
-            Application(position: "Sample 2", businessSector: "Insurance", positionType: "Contract", remunerationType: "Daily", remunerationAmount: 550.0, employmentType: "Contract", iR35: "Outside", positionCommitment: "Full time", workstyle: "Hybrid", officeDays: "Twice", whereAdvertised: "JobServe", dateApplied: lastWeek!, requiredSkills: "Some", requiredExperience: "Some", update: "", updatedAt: twoDaysAgo!, interviewDate: nextWeek!, interviewResult: "", notes: "", appStatus: "Open"),
-            Application(position: "Sample 3", businessSector: "Insurance", positionType: "Contract", remunerationType: "Daily", remunerationAmount: 650.0, employmentType: "Contract", iR35: "Outside", positionCommitment: "Full time", workstyle: "Office", officeDays: "5 days", whereAdvertised: "LinkedIn", dateApplied: lastWeek!, requiredSkills: "Some", requiredExperience: "Some", update: "", updatedAt: twoDaysAgo!, interviewDate: nextWeek!, interviewResult: "", notes: "", appStatus: "Interview"),
-            Application(position: "Sample 4", businessSector: "Insurance", positionType: "Contract", remunerationType: "Daily", remunerationAmount: 700.0, employmentType: "Contract", iR35: "Outside", positionCommitment: "Full time", workstyle: "Remote", officeDays: "Fully remote", whereAdvertised: "JobServe", dateApplied: lastWeek!, requiredSkills: "Some", requiredExperience: "Some", update: "", updatedAt: twoDaysAgo!, interviewDate: lastWeek!, interviewResult: "Unsuccessful", notes: "", appStatus: "Closed")
+            Application(
+                position: "Sample 1",
+                businessSector: "Insurance",
+                positionType: "Contract",
+                employmentType: "Contract",
+                dateApplied: lastWeek!,
+                whereAdvertised: "Direct contact",
+                requiredSkills: "Some",
+                requiredExperience: "Some",
+                remunerationType: "Daily",
+                remunerationAmount: 600.0,
+                iR35: "Outside",
+                positionCommitment: "Full time",
+                workstyle: "Remote",
+                officeDays: "Occasionally",
+                update: "",
+                updatedAt: twoDaysAgo!,
+                notes: "",
+                appStatus: "Open"),
+            Application(
+                position: "Sample 2",
+                businessSector: "Insurance",
+                positionType: "Contract",
+                employmentType: "Contract",
+                dateApplied: lastWeek!,
+                whereAdvertised: "JobServe",
+                requiredSkills: "Some",
+                requiredExperience: "Some",
+                remunerationType: "Daily",
+                remunerationAmount: 550.0,
+                iR35: "Outside",
+                positionCommitment: "Full time",
+                workstyle: "Hybrid",
+                officeDays: "Twice",
+                update: "",
+                updatedAt: twoDaysAgo!,
+                notes: "",
+                appStatus: "Open"),
+            Application(
+                position: "Sample 3",
+                businessSector: "Insurance",
+                positionType: "Contract",
+                employmentType: "Contract",
+                dateApplied: lastWeek!,
+                whereAdvertised: "LinkedIn",
+                requiredSkills: "Some",
+                requiredExperience: "Some",
+                remunerationType: "Daily",
+                remunerationAmount: 650.0,
+                iR35: "Outside",
+                positionCommitment: "Full time",
+                workstyle: "Office",
+                officeDays: "5 days",
+                update: "",
+                updatedAt: twoDaysAgo!,
+                notes: "",
+                appStatus: "Interview"),
+            Application(
+                position: "Sample 4",
+                businessSector: "Insurance",
+                positionType: "Contract",
+                employmentType: "Contract",
+                dateApplied: lastWeek!,
+                whereAdvertised: "JobServe",
+                requiredSkills: "Some",
+                requiredExperience: "Some",
+                remunerationType: "Daily",
+                remunerationAmount: 700.0,
+                iR35: "Outside",
+                positionCommitment: "Full time",
+                workstyle: "Remote",
+                officeDays: "Fully remote",
+                update: "",
+                updatedAt: twoDaysAgo!,
+                notes: "",
+                appStatus: "Closed")
         ]
     }
 }
@@ -74,14 +146,4 @@ extension Interview {
     }
 }
 
-extension Status {
-    static var sampleStatuses: [Status] {
-        [
-            Status(name: "Open"),
-            Status(name: "Interview"),
-            Status(name: "Offer"),
-            Status(name: "Acceptance"),
-            Status(name: "Closed")
-        ]
-    }
-}
+

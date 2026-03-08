@@ -12,11 +12,9 @@
 		411AD77F2BFCE81300C35C85 /* AgentRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AD77E2BFCE81300C35C85 /* AgentRow.swift */; };
 		411AD7812BFCF41F00C35C85 /* ApplicationsByStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AD7802BFCF41F00C35C85 /* ApplicationsByStatus.swift */; };
 		411D04862BF4D72700E1B78B /* ApplicationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411D04852BF4D72700E1B78B /* ApplicationList.swift */; };
-		411D04882BF64F8D00E1B78B /* Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411D04872BF64F8D00E1B78B /* Status.swift */; };
-		411D048A2BF65EF200E1B78B /* StatusList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411D04892BF65EF200E1B78B /* StatusList.swift */; };
-		411D048C2BF65F0B00E1B78B /* StatusDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411D048B2BF65F0B00E1B78B /* StatusDetail.swift */; };
 		4128B5E72C02A1AA006B7B1D /* AppStatusStackedBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4128B5E62C02A1AA006B7B1D /* AppStatusStackedBarChart.swift */; };
 		4128B5E92C049821006B7B1D /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4128B5E82C049821006B7B1D /* ChartsView.swift */; };
+		412B9C392F5DEF3000E257E0 /* ApplicationStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 412B9C382F5DEF3000E257E0 /* ApplicationStatus.swift */; };
 		41335B0B2C072F9C00FDD0EC /* AppStatusBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41335B0A2C072F9C00FDD0EC /* AppStatusBarChart.swift */; };
 		41335B0D2C07303000FDD0EC /* ChartData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41335B0C2C07303000FDD0EC /* ChartData.swift */; };
 		41335B0F2C089A5E00FDD0EC /* AgentByStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41335B0E2C089A5E00FDD0EC /* AgentByStatus.swift */; };
@@ -29,7 +27,6 @@
 		4175B15C2D5E0C5100DB32AB /* Detail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175B15B2D5E0C5100DB32AB /* Detail.swift */; };
 		419DFC872F3FCED0006F7434 /* iPadLayoutFixes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DFC862F3FCED0006F7434 /* iPadLayoutFixes.swift */; };
 		419DFC892F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md in Resources */ = {isa = PBXBuildFile; fileRef = 419DFC882F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md */; };
-		419DFC8B2F3FE6FD006F7434 /* StatusInitializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DFC8A2F3FE6FD006F7434 /* StatusInitializer.swift */; };
 		41AD3FE52EC551220056C9DC /* MVP_Plan.md in Resources */ = {isa = PBXBuildFile; fileRef = 41AD3FE42EC551210056C9DC /* MVP_Plan.md */; };
 		41AD3FE72EC552030056C9DC /* PRIORITY_FIXES.md in Resources */ = {isa = PBXBuildFile; fileRef = 41AD3FE62EC552030056C9DC /* PRIORITY_FIXES.md */; };
 		41AD3FE92EC695930056C9DC /* ApplicationListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41AD3FE82EC695930056C9DC /* ApplicationListRowView.swift */; };
@@ -62,7 +59,6 @@
 		41CEDD712BB6E1C600F40A7B /* Agency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEDD702BB6E1C600F40A7B /* Agency.swift */; };
 		41CEDD732BB6E22C00F40A7B /* Agent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEDD722BB6E22C00F40A7B /* Agent.swift */; };
 		41CEDD752BB6E2D500F40A7B /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEDD742BB6E2D500F40A7B /* Client.swift */; };
-		41CEDD792BB6EB7500F40A7B /* ApplicationListRowView_OLD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEDD782BB6EB7500F40A7B /* ApplicationListRowView_OLD.swift */; };
 		41CEDD812BB71EC700F40A7B /* ApplicationDetailView_old.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CEDD802BB71EC700F40A7B /* ApplicationDetailView_old.swift */; };
 		41F0F94D2F38B1DF00D897D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41F0F94C2F38B1DF00D897D1 /* Assets.xcassets */; };
 		41F6FE242D5E1DB800F7ED5D /* EditableDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41F6FE232D5E1DB800F7ED5D /* EditableDetail.swift */; };
@@ -76,11 +72,9 @@
 		411AD77E2BFCE81300C35C85 /* AgentRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRow.swift; sourceTree = "<group>"; };
 		411AD7802BFCF41F00C35C85 /* ApplicationsByStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationsByStatus.swift; sourceTree = "<group>"; };
 		411D04852BF4D72700E1B78B /* ApplicationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationList.swift; sourceTree = "<group>"; };
-		411D04872BF64F8D00E1B78B /* Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Status.swift; sourceTree = "<group>"; };
-		411D04892BF65EF200E1B78B /* StatusList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusList.swift; sourceTree = "<group>"; };
-		411D048B2BF65F0B00E1B78B /* StatusDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusDetail.swift; sourceTree = "<group>"; };
 		4128B5E62C02A1AA006B7B1D /* AppStatusStackedBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusStackedBarChart.swift; sourceTree = "<group>"; };
 		4128B5E82C049821006B7B1D /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
+		412B9C382F5DEF3000E257E0 /* ApplicationStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStatus.swift; sourceTree = "<group>"; };
 		41335B0A2C072F9C00FDD0EC /* AppStatusBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStatusBarChart.swift; sourceTree = "<group>"; };
 		41335B0C2C07303000FDD0EC /* ChartData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartData.swift; sourceTree = "<group>"; };
 		41335B0E2C089A5E00FDD0EC /* AgentByStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentByStatus.swift; sourceTree = "<group>"; };
@@ -93,7 +87,6 @@
 		4175B15B2D5E0C5100DB32AB /* Detail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Detail.swift; sourceTree = "<group>"; };
 		419DFC862F3FCED0006F7434 /* iPadLayoutFixes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iPadLayoutFixes.swift; sourceTree = "<group>"; };
 		419DFC882F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CRASH_FIX_ANALYSIS.md; sourceTree = "<group>"; };
-		419DFC8A2F3FE6FD006F7434 /* StatusInitializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusInitializer.swift; sourceTree = "<group>"; };
 		41AD3FE42EC551210056C9DC /* MVP_Plan.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MVP_Plan.md; sourceTree = "<group>"; };
 		41AD3FE62EC552030056C9DC /* PRIORITY_FIXES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRIORITY_FIXES.md; sourceTree = "<group>"; };
 		41AD3FE82EC695930056C9DC /* ApplicationListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationListRowView.swift; sourceTree = "<group>"; };
@@ -129,7 +122,6 @@
 		41CEDD702BB6E1C600F40A7B /* Agency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agency.swift; sourceTree = "<group>"; };
 		41CEDD722BB6E22C00F40A7B /* Agent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agent.swift; sourceTree = "<group>"; };
 		41CEDD742BB6E2D500F40A7B /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
-		41CEDD782BB6EB7500F40A7B /* ApplicationListRowView_OLD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationListRowView_OLD.swift; sourceTree = "<group>"; };
 		41CEDD802BB71EC700F40A7B /* ApplicationDetailView_old.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationDetailView_old.swift; sourceTree = "<group>"; };
 		41F0F94C2F38B1DF00D897D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		41F6FE232D5E1DB800F7ED5D /* EditableDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditableDetail.swift; sourceTree = "<group>"; };
@@ -157,7 +149,6 @@
 		411AD7762BFCE3FC00C35C85 /* Application */ = {
 			isa = PBXGroup;
 			children = (
-				41CEDD782BB6EB7500F40A7B /* ApplicationListRowView_OLD.swift */,
 				416F8CD32BF2545100BC4BE8 /* FilteredApplicationList.swift */,
 				411D04852BF4D72700E1B78B /* ApplicationList.swift */,
 				41CEDD802BB71EC700F40A7B /* ApplicationDetailView_old.swift */,
@@ -229,8 +220,7 @@
 		411AD77C2BFCE4A000C35C85 /* Status */ = {
 			isa = PBXGroup;
 			children = (
-				411D04892BF65EF200E1B78B /* StatusList.swift */,
-				411D048B2BF65F0B00E1B78B /* StatusDetail.swift */,
+				412B9C382F5DEF3000E257E0 /* ApplicationStatus.swift */,
 			);
 			path = Status;
 			sourceTree = "<group>";
@@ -273,7 +263,6 @@
 				41CEDD5D2BB6D89800F40A7B /* Products */,
 				419DFC862F3FCED0006F7434 /* iPadLayoutFixes.swift */,
 				419DFC882F3FD1EE006F7434 /* CRASH_FIX_ANALYSIS.md */,
-				419DFC8A2F3FE6FD006F7434 /* StatusInitializer.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -323,7 +312,6 @@
 				41CEDD722BB6E22C00F40A7B /* Agent.swift */,
 				41CEDD742BB6E2D500F40A7B /* Client.swift */,
 				41B9E8452BD1545800474E45 /* Interview.swift */,
-				411D04872BF64F8D00E1B78B /* Status.swift */,
 				41AD3FED2EC6A40A0056C9DC /* Application+SampleData.swift */,
 			);
 			path = Model;
@@ -461,18 +449,15 @@
 				41AD404C2EC89F530056C9DC /* Color+Extensions.swift in Sources */,
 				41335B112C089A8200FDD0EC /* AgencyByStatus.swift in Sources */,
 				41B9E8462BD1545800474E45 /* Interview.swift in Sources */,
-				419DFC8B2F3FE6FD006F7434 /* StatusInitializer.swift in Sources */,
 				411AD7752BFB855800C35C85 /* InterviewListRow.swift in Sources */,
 				419DFC872F3FCED0006F7434 /* iPadLayoutFixes.swift in Sources */,
 				41CEDD6F2BB6D8FB00F40A7B /* Application.swift in Sources */,
 				41AD3FF72EC7F3530056C9DC /* ApplicationDetailView.swift in Sources */,
-				411D048A2BF65EF200E1B78B /* StatusList.swift in Sources */,
 				416F8CD42BF2545100BC4BE8 /* FilteredApplicationList.swift in Sources */,
 				41335B172C13289400FDD0EC /* Samples.swift in Sources */,
 				4175B15C2D5E0C5100DB32AB /* Detail.swift in Sources */,
 				41F6FE292D5E1E4600F7ED5D /* ViewModel.swift in Sources */,
 				41CAFE132BBC5473009FF139 /* AgentDetailView.swift in Sources */,
-				411D048C2BF65F0B00E1B78B /* StatusDetail.swift in Sources */,
 				41335B192C134A0700FDD0EC /* PreviewContainer.swift in Sources */,
 				41CAFE112BBC5461009FF139 /* AgencyList.swift in Sources */,
 				41AD404E2EC8B1030056C9DC /* ClientListRow.swift in Sources */,
@@ -484,7 +469,6 @@
 				416F8CD02BF0D7EF00BC4BE8 /* SectionedQueryView.swift in Sources */,
 				41B9E84A2BD156FA00474E45 /* InterviewDetailView.swift in Sources */,
 				41AD3FEE2EC6A40A0056C9DC /* Application+SampleData.swift in Sources */,
-				411D04882BF64F8D00E1B78B /* Status.swift in Sources */,
 				41335B0B2C072F9C00FDD0EC /* AppStatusBarChart.swift in Sources */,
 				41CAFF062BC8EF06009FF139 /* AgencyDetailView.swift in Sources */,
 				41335B0D2C07303000FDD0EC /* ChartData.swift in Sources */,
@@ -495,12 +479,12 @@
 				411D04862BF4D72700E1B78B /* ApplicationList.swift in Sources */,
 				41CEDD732BB6E22C00F40A7B /* Agent.swift in Sources */,
 				41CEDD752BB6E2D500F40A7B /* Client.swift in Sources */,
+				412B9C392F5DEF3000E257E0 /* ApplicationStatus.swift in Sources */,
 				41B9E8562BD9B7A200474E45 /* Date.swift in Sources */,
 				411AD7812BFCF41F00C35C85 /* ApplicationsByStatus.swift in Sources */,
 				4128B5E72C02A1AA006B7B1D /* AppStatusStackedBarChart.swift in Sources */,
 				41335B0F2C089A5E00FDD0EC /* AgentByStatus.swift in Sources */,
 				41AD3FF52EC6A5DE0056C9DC /* ApplicationListCard.swift in Sources */,
-				41CEDD792BB6EB7500F40A7B /* ApplicationListRowView_OLD.swift in Sources */,
 				41AD3FF32EC6A5940056C9DC /* SectionCard.swift in Sources */,
 				41B9E8502BD5B31A00474E45 /* FilteredAgencyList.swift in Sources */,
 				41CEDD712BB6E1C600F40A7B /* Agency.swift in Sources */,

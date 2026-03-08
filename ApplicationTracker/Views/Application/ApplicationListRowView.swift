@@ -4,11 +4,6 @@
 //
 //  Created by Mark Brown on 13/11/2025.
 //
-
-//
-//  ApplicationListRowView.swift
-//  ApplicationTracker
-//
 //  REDESIGNED VERSION - Drop-in replacement for existing view
 //  Created by Mark Brown on 29/03/2024.
 //  Redesigned for App Store readiness
@@ -137,8 +132,7 @@ struct ApplicationListRowView: View {
                 
                 // Elapsed days (only show for open/interview)
                 if application.appStatus == "Open" || application.appStatus == "Interview" {
-                    let days = calculateElapsedDays()
-                    Text("\(days)d ago")
+                    Text("\(calculateElapsedDays())d ago")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -160,7 +154,7 @@ struct ApplicationListRowView: View {
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(
-        for: Application.self, Agent.self, Agency.self, Client.self, Status.self,
+        for: Application.self, Agent.self, Agency.self, Client.self,
         configurations: config
     )
     
@@ -186,7 +180,7 @@ struct ApplicationListRowView: View {
         dateApplied: Calendar.current.date(byAdding: .day, value: -5, to: Date())!,
         appStatus: "Open"
     )
-    app2.agency = agency
+    app2.agent = agent   // agency is derived via agent?.agency — no direct setter
     
     let app3 = Application(
         position: "Senior PM",
@@ -220,4 +214,5 @@ struct ApplicationListRowView: View {
     .background(Color.black)
     .modelContainer(container)
 }
+
 

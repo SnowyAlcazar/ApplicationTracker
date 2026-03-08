@@ -12,16 +12,12 @@ struct ApplicationList: View {
     @Environment(\.modelContext) var modelContext
     @State private var searchText = ""
     @State private var newApplication: Application?
-    @Query var statuses: [Status]
     @Query var clients: [Client]
     @Query var agents: [Agent]
     @Query var agencies: [Agency]
     @Query var applications: [Application]
     @State private var sortOrder = KeyPathComparator(\Application.dateApplied)
-    @State private var showClosedApplications = false
-    var status = Status()
     
-    @State private var hasInitializedStatuses = false
     
     ///For amending the Query and filtering/sorting the applicationFilter results
     ///_applications = Query(filter: predicate, sort: [SortDescriptor(\Application.status?.name, order: .reverse), SortDescriptor(\Application.dateApplied, order: .reverse)])
@@ -40,7 +36,7 @@ struct ApplicationList: View {
             || application.requiredSkills.localizedStandardContains(applicationFilter)
             || application.appStatus.localizedStandardContains(applicationFilter)
         }
-        _applications = Query(filter: predicate, sort: [SortDescriptor(\Application.status?.name, order: .forward), SortDescriptor(\Application.dateApplied, order: .reverse)])
+        _applications = Query(filter: predicate, sort: [SortDescriptor(\Application.appStatus, order: .forward), SortDescriptor(\Application.dateApplied, order: .reverse)])
     }
 
     // UPDATE ApplicationList.swift
@@ -92,8 +88,6 @@ struct ApplicationList: View {
         }
         .onAppear {
             print("🔵 ApplicationList appeared")
-            print("🔵 Current statuses count: \(statuses.count)")
-            initializeDefaultStatuses()
         }
     }
     
@@ -110,8 +104,8 @@ struct ApplicationList: View {
             let newItem = Application(
                 position: "",
                 positionType: "",
-                remunerationType: "",
                 employmentType: "",
+                remunerationType: "",
                 iR35: "",
                 positionCommitment: "",
                 workstyle: "",
@@ -119,55 +113,6 @@ struct ApplicationList: View {
                 appStatus: "Open")
             modelContext.insert(newItem)
             newApplication = newItem
-        }
-    }
-    
-    private func initializeDefaultStatuses() {
-        // Only initialize once
-        guard !hasInitializedStatuses else { 
-            print("🔵 Already initialized statuses flag")
-            return 
-        }
-        hasInitializedStatuses = true
-        
-        print("🔵 Initializing statuses...")
-        
-        // Define required statuses
-        let defaultStatuses = [
-            "Open",
-            "Interview",
-            "On hold",
-            "Offer",
-            "Accepted",
-            "Closed"
-        ]
-        
-        // Get names of existing statuses
-        let existingNames = Set(statuses.map { $0.name })
-        print("   Found \(statuses.count) existing: \(existingNames)")
-        
-        // Create any missing statuses
-        var created = 0
-        for statusName in defaultStatuses {
-            if !existingNames.contains(statusName) {
-                let status = Status(name: statusName)
-                modelContext.insert(status)
-                print("   ✅ Creating status: '\(statusName)'")
-                created += 1
-            } else {
-                print("   ℹ️ Already exists: '\(statusName)'")
-            }
-        }
-        
-        if created > 0 {
-            do {
-                try modelContext.save()
-                print("📋 Created \(created) new status(es)!")
-            } catch {
-                print("❌ Error saving: \(error)")
-            }
-        } else {
-            print("📋 All 6 statuses already exist")
         }
     }
 }

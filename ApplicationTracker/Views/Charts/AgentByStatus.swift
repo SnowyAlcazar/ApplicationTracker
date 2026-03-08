@@ -12,7 +12,6 @@ import Charts
 struct AgentByStatus: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: \Application.appStatus, order: .forward) var applications: [Application]
-    @Query(sort: \Status.name, order: .reverse) var statuses: [Status]
     @Query(sort: \Agent.name, order: .forward) var agents: [Agent]
     
     @State private var dataPoints: [StatusData] = []
@@ -50,17 +49,15 @@ struct AgentByStatus: View {
     }
        
     func populateDataPoints(type: String, val: Int) {
-        for status in statuses {
+        for status in ApplicationStatus.allCases where status != .closed {
             var count = 0
-            if status.name != "Closed" {
-                for app in applications {
-                    if app.appStatus == status.name {
-                        count += 1
-                    }
+            for app in applications {
+                if app.appStatus == status.rawValue {
+                    count += 1
                 }
-                if count > 0 {
-                    dataPoints.append(StatusData (type: status.name, val: count))
-                }
+            }
+            if count > 0 {
+                dataPoints.append(StatusData(type: status.rawValue, val: count))
             }
         }
     }

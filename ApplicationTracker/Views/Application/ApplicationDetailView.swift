@@ -18,9 +18,6 @@ struct ApplicationDetailView: View {
     @State private var newInterview: Interview?
     @State private var sortOrder = KeyPathComparator(\Interview.interviewDate)
     
-    // Prevent update loops on iPad
-    @State private var isUpdatingStatus = false
-    
     // Detect iPad for layout adjustments
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -41,14 +38,12 @@ struct ApplicationDetailView: View {
     @Query(sort: [SortDescriptor(\Agency.name)]) var agencies: [Agency]
     @Query(sort: [SortDescriptor(\Agent.name)]) var agents: [Agent]
     @Query(sort: [SortDescriptor(\Client.name)]) var clients: [Client]
-    @Query(sort: [SortDescriptor(\Status.name)]) var statuses: [Status]
 
     enum FocusedField {
          case position
     }
 
     @FocusState private var focusedField: FocusedField?
-    @State private var newStatus: Status?
     
     // Employment Type Options
     enum EmploymentType: String, CaseIterable {
@@ -422,19 +417,10 @@ struct ApplicationDetailView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                         }
-                        .disabled(application.status?.name == "Closed")
+                        .disabled(application.appStatus == "Closed")
                         
-                        // Interview list - Use let binding to cache the sorted result
-                        let sortedInterviews = application.sortedInterviews
-                        if !sortedInterviews.isEmpty {
-                            ForEach(sortedInterviews) { interview in
-                                NavigationLink {
-                                    InterviewDetailView(interview: interview, isNew: false)
-                                } label: {
-                                    InterviewRow(interview: interview)
-                                }
-                            }
-                        } else {
+                        // Interview list
+                        if application.sortedInterviews.isEmpty {
                             Text("No interviews scheduled")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -442,6 +428,14 @@ struct ApplicationDetailView: View {
                                 .padding()
                                 .background(Color(.systemGray6).opacity(0.5))
                                 .cornerRadius(8)
+                        } else {
+                            ForEach(application.sortedInterviews) { interview in
+                                NavigationLink {
+                                    InterviewDetailView(interview: interview, isNew: false)
+                                } label: {
+                                    InterviewRow(interview: interview)
+                                }
+                            }
                         }
                     }
                 }
@@ -478,31 +472,20 @@ struct ApplicationDetailView: View {
                             Label("Status", systemImage: "flag.fill")
                                 .font(.subheadline)
                                 .foregroundColor(.blue.opacity(0.8))
-                            
+
                             Spacer()
-                            
-                            Picker("Status", selection: $application.status) {
-                                Text("None")
-                                    .tag(nil as Status?)
-                                ForEach(statuses) { status in
-                                    Text(status.name)
-                                        .tag(status as Status?)
+
+                            Picker("Status", selection: $application.appStatus) {
+                                ForEach(ApplicationStatus.allCases) { status in
+                                    Text(status.rawValue).tag(status.rawValue)
                                 }
                             }
                             .labelsHidden()
-                            
-                            Button(action: addStatus) {
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(.blue)
-                            }
                         }
-                        
-                        // Show current status badge
-                        if !application.appStatus.isEmpty {
-                            HStack {
-                                StatusBadge(status: application.appStatus, size: .large)
-                                Spacer()
-                            }
+
+                        HStack {
+                            StatusBadge(status: application.appStatus, size: .large)
+                            Spacer()
                         }
                     }
                 }
@@ -533,92 +516,15 @@ struct ApplicationDetailView: View {
             }
             // Set IR35 state on appear
             isInsideIR35 = (application.iR35 == IR35Status.inside.rawValue)
-            
-            // Sync appStatus with status on appear
-            if let statusName = application.status?.name {
-                let expectedAppStatus: String
-                switch statusName {
-                case "Closed": 
-                    expectedAppStatus = "Closed"
-                case "Interview", "Interviewing": 
-                    expectedAppStatus = "Interview"
-                case "On hold": 
-                    expectedAppStatus = "On hold"
-                case "Offer", "Offered": 
-                    expectedAppStatus = "Offer"
-                case "Accepted", "Acceptance": 
-                    expectedAppStatus = "Accepted"
-                case "Open":
-                    expectedAppStatus = "Open"
-                default: 
-                    expectedAppStatus = statusName // Use the status name as-is
-                }
-                
-                if application.appStatus != expectedAppStatus {
-                    print("📍 onAppear: Syncing appStatus '\(application.appStatus)' → '\(expectedAppStatus)'")
-                    application.appStatus = expectedAppStatus
-                }
-            } else if application.appStatus.isEmpty {
-                // No status selected, default to Open
-                print("📍 onAppear: No status selected, defaulting to 'Open'")
-                application.appStatus = "Open"
-            }
-        }
-        .onChange(of: application.status?.name) { oldValue, newValue in
-            // Prevent recursive updates
-            guard !isUpdatingStatus else { 
-                print("⚠️ Blocked recursive status update")
-                return 
-            }
-            guard oldValue != newValue else { 
-                print("⚠️ Status name unchanged: \(newValue ?? "nil")")
-                return 
-            }
-            
-            print("✅ Status changing from '\(oldValue ?? "nil")' to '\(newValue ?? "nil")'")
-            
-            isUpdatingStatus = true
-            defer { isUpdatingStatus = false }
-            
-            let newAppStatus: String
-            switch application.status?.name {
-            case "Closed": 
-                newAppStatus = "Closed"
-            case "Interview", "Interviewing": 
-                newAppStatus = "Interview"
-            case "On hold": 
-                newAppStatus = "On hold"
-            case "Offer", "Offered": 
-                newAppStatus = "Offer"
-            case "Accepted", "Acceptance": 
-                newAppStatus = "Accepted"
-            case "Open":
-                newAppStatus = "Open"
-            case nil:
-                newAppStatus = "Open" // Default when no status selected
-            default: 
-                newAppStatus = application.status?.name ?? "Open" // Use the status name as-is
-            }
-            
-            print("   Setting appStatus to: '\(newAppStatus)' (was: '\(application.appStatus)')")
-            
-            // Only update if the status is actually different
-            if application.appStatus != newAppStatus {
-                application.appStatus = newAppStatus
-                print("   ✅ appStatus updated successfully")
-            } else {
-                print("   ℹ️ appStatus already correct")
+
+            // Default appStatus if somehow empty
+            if application.appStatus.isEmpty {
+                application.appStatus = ApplicationStatus.open.rawValue
             }
         }
         .sheet(item: $newInterview) { interview in
             NavigationStack {
                 InterviewDetailView(interview: interview, isNew: true)
-            }
-            .interactiveDismissDisabled()
-        }
-        .sheet(item: $newStatus) { status in
-            NavigationStack {
-                StatusDetail(status: status, isNew: true)
             }
             .interactiveDismissDisabled()
         }
@@ -664,14 +570,6 @@ struct ApplicationDetailView: View {
             let newItem = Interview(name: "", interviewDate: Date(), startTime: Date(), endTime: Date(), location: "", interviewer: "", result: "", notes: "", application: application)
             application.interviews?.append(newItem)
             newInterview = newItem
-        }
-    }
-    
-    private func addStatus() {
-        withAnimation {
-            let newItem = Status(name: "")
-            modelContext.insert(newItem)
-            newStatus = newItem
         }
     }
     
@@ -752,49 +650,45 @@ struct InterviewRow: View {
     }
 }
 
-#Preview {
-    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: Application.self, Agent.self, Agency.self, Client.self, Status.self, Interview.self,
-        configurations: config
-    )
-    
-    let agent = Agent(name: "Adele Bywater", mobilePhone: "020 7092 3204")
-    let client = Client(name: "ECMS Consultancy")
-    let agency = Agency(name: "ECMS Agency")
-    let status = Status(name: "Interview")
-    
-    let application = Application(
-        position: "Contract PM - ECMS",
-        businessSector: "Insurance",
-        positionType: "Project Manager",
-        remunerationType: "Weekly",
-        remunerationAmount: 650,
-        employmentType: "Contract",
-        iR35: "Outside IR35",
-        positionCommitment: "",
-        workstyle: "Hybrid",
-        officeDays: "3",
-        whereAdvertised: "Direct from Adele",
-        dateApplied: Calendar.current.date(byAdding: .day, value: -15, to: Date())!,
-        requiredSkills: "Insurance, Azure, Cloud migration",
-        notes: "Great opportunity",
-        appStatus: "Interview"
-    )
-    application.agent = agent
-    application.client = client
-    application.agency = agency
-    application.status = status
-    
-    container.mainContext.insert(agent)
-    container.mainContext.insert(client)
-    container.mainContext.insert(agency)
-    container.mainContext.insert(status)
-    container.mainContext.insert(application)
-    
-    return NavigationStack {
-        ApplicationDetailView(application: application)
-            .modelContainer(container)
-    }
-}
-
+//#Preview {
+//    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+//    let container = try! ModelContainer(
+//        for: Application.self, Agent.self, Agency.self, Client.self, Interview.self,
+//        configurations: config
+//    )
+//
+//    let agent = Agent(name: "Adele Bywater", mobilePhone: "020 7092 3204")
+//    let client = Client(name: "ECMS Consultancy")
+//    let agency = Agency(name: "ECMS Agency")
+//
+//    let application = Application(
+//        position: "Contract PM - ECMS",
+//        businessSector: "Insurance",
+//        positionType: "Project Manager",
+//        employmentType: "Contract",
+//        dateApplied: Calendar.current.date(byAdding: .day, value: -15, to: Date())!,
+//        whereAdvertised: "Direct from Adele",
+//        requiredSkills: "Insurance, Azure, Cloud migration",
+//        remunerationType: "Weekly",
+//        remunerationAmount: 650,
+//        iR35: "Outside IR35",
+//        positionCommitment: "",
+//        workstyle: "Hybrid",
+//        officeDays: "3",
+//        notes: "Great opportunity",
+//        appStatus: "Interview"
+//    )
+//    application.agent = agent
+//    application.client = client
+//
+//    container.mainContext.insert(agent)
+//    container.mainContext.insert(client)
+//    container.mainContext.insert(agency)
+//    container.mainContext.insert(application)
+//
+//    NavigationStack {
+//
+//        ApplicationDetailView(application: application)
+//            .modelContainer(container)
+//    }
+//}

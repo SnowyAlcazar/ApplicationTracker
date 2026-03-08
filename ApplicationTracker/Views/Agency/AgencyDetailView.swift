@@ -16,7 +16,6 @@ struct AgencyDetailView: View {
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @State private var sortOrder = KeyPathComparator(\Application.dateApplied)
 
     init(agency: Agency, isNew: Bool = false) {
         self.agency = agency
@@ -25,6 +24,14 @@ struct AgencyDetailView: View {
      @State private var name = ""
      @FocusState private var focusedField: FocusedField?
     
+    // Derived from Agency → agents → representedBy to avoid storing a direct
+    // agency-to-applications relationship (which breaks when agents move agencies).
+    private var agencyApplications: [Application] {
+        agency.sortedAgents
+            .flatMap { $0.representedBy ?? [] }
+            .sorted { $0.dateApplied > $1.dateApplied }
+    }
+
     var body: some View {
         Form {
             if isNew {
@@ -55,10 +62,9 @@ struct AgencyDetailView: View {
             }
 
             Section("Applications represented by \(agency.name)") {
-                let sortedApplications = agency.representedApplications?.sorted(using: sortOrder) ?? []
                 List {
-                    if !sortedApplications.isEmpty {
-                        ForEach(sortedApplications) { assocApp in
+                    if !agencyApplications.isEmpty {
+                        ForEach(agencyApplications) { assocApp in
                             NavigationLink {
                                 ApplicationDetailView(application: assocApp, isNew: false)
                                     .navigationTitle("Application Detail")
@@ -103,3 +109,4 @@ struct AgencyDetailView: View {
 //            .modelContainer(preview.container)
 //    }
 //}
+
